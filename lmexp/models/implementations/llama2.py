@@ -4,9 +4,9 @@ from lmexp.generic.tokenizer import Tokenizer
 import torch
 
 
-class Llama3Tokenizer(Tokenizer):
+class Llama2Tokenizer(Tokenizer):
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
 
     def encode(self, text):
         return self.tokenizer.encode(text, return_tensors="pt")
@@ -14,12 +14,12 @@ class Llama3Tokenizer(Tokenizer):
     def decode(self, tensor):
         return self.tokenizer.decode(tensor, skip_special_tokens=True)
 
-class ProbedLlama3(HookedModel):
+class ProbedLlama2(HookedModel):
     def __init__(self):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B").to(device)
+        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf").to(device)
         self.model.config.pad_token_id = self.model.config.eos_token_id
-        self.end_of_instruction = MODEL_ID_TO_END_OF_INSTRUCTION.get("meta-llama/Meta-Llama-3-8B", "")
+        self.end_of_instruction = MODEL_ID_TO_END_OF_INSTRUCTION.get("meta-llama/Llama-2-7b-chat-hf", "")
 
     def get_n_layers(self):
         return len(self.model.model.layers)

@@ -1,6 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from lmexp.generic.hooked_model import HookedModel
 from lmexp.generic.tokenizer import Tokenizer
+from lmexp.models.model_names import MODEL_ID_TO_END_OF_INSTRUCTION
 import torch
 
 
@@ -17,7 +18,7 @@ class Llama3Tokenizer(Tokenizer):
 class ProbedLlama3(HookedModel):
     def __init__(self):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B").to(device)
+        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B", torch_dtype=torch.float16).to(device)
         self.model.config.pad_token_id = self.model.config.eos_token_id
         self.end_of_instruction = MODEL_ID_TO_END_OF_INSTRUCTION.get("meta-llama/Meta-Llama-3-8B", "")
 
@@ -25,6 +26,9 @@ class ProbedLlama3(HookedModel):
         return len(self.model.model.layers)
 
     def forward(self, x: torch.tensor):
+        print("Input to ProbedLlama3 shape:", x.shape)
+        if len(x.shape) == 3 and x.shape[1] == 1:
+            x = x.squeeze(1)
         return self.model(x)
 
     def sample(self, tokens: torch.tensor, max_n_tokens: int) -> torch.tensor:

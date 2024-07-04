@@ -17,9 +17,9 @@ def train_probe(
     save_to: str | None = "probe.pth",
     loss_type: Literal["mse", "bce"] = "mse",
 ) -> torch.nn.Linear:
-    print("running on device:", model.device)
+    #print("running on device:", model.device)
     tokenized = [(tokenizer.encode(text), label) for text, label in labeled_text]
-    print("Sample tokenized shape:", tokenized[0][0].shape)
+    #print("Sample tokenized shape:", tokenized[0][0].shape)
     probe = torch.nn.Linear(model.resid_dim(), 1, bias=True).to(model.device)
     probe.train()
     optimizer = torch.optim.AdamW(probe.parameters(), lr=lr)
@@ -47,7 +47,7 @@ def train_probe(
                     for token in tokens
                 ]
             )
-            print("Batch tokens shape:", tokens.shape)
+            #print("Batch tokens shape:", tokens.shape)
             model.forward(tokens.to(model.device))
             label_batch = torch.tensor(labels)
             if token_position < 0:
@@ -55,12 +55,12 @@ def train_probe(
             else:
                 token_positions = torch.tensor([token_position] * batch_size)
             saved_acts = torch.cat(model.get_saved_activations(layer))
-            print("Saved activations shape:", saved_acts.shape)
+            #print("Saved activations shape:", saved_acts.shape)
             acts = saved_acts[torch.arange(batch_size), token_positions, :]
-            print("Selected activations shape:", acts.shape)
+            #print("Selected activations shape:", acts.shape)
             preds = probe(acts.to(model.device)).squeeze()
-            print("Predictions shape:", preds.shape)
-            print("Labels shape:", label_batch.shape)
+            #print("Predictions shape:", preds.shape)
+            #print("Labels shape:", label_batch.shape)
             if loss_type == "mse":
                 loss = ((preds - label_batch.to(model.device)) ** 2).mean()
             elif loss_type == "bce":

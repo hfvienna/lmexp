@@ -18,7 +18,7 @@ class Llama3Tokenizer(Tokenizer):
 class ProbedLlama3(HookedModel):
     def __init__(self):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B", torch_dtype=torch.float16).to(device)
+        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B").to(device)
         self.model.config.pad_token_id = self.model.config.eos_token_id
         self.end_of_instruction = MODEL_ID_TO_END_OF_INSTRUCTION.get("meta-llama/Meta-Llama-3-8B", "")
 

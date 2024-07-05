@@ -26,7 +26,7 @@ class ProbedLlama3(HookedModel):
         return len(self.model.model.layers)
 
     def forward(self, x: torch.tensor):
-        print("Input to ProbedLlama3 shape:", x.shape)
+        #print("Input to ProbedLlama3 shape:", x.shape)
         if len(x.shape) == 3 and x.shape[1] == 1:
             x = x.squeeze(1)
         return self.model(x)

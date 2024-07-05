@@ -75,6 +75,8 @@ def train_probe(
 
     if save_to is not None:
         torch.save(probe, save_to)
+        print(f"Probe saved to: {save_to}")
+        
     return probe
 
 
